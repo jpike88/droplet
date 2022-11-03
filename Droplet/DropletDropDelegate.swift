@@ -33,84 +33,83 @@ struct DropletDropDelegate : DropDelegate {
         )
         let s3 = S3(client: awsClient, region: SotoS3.Region.init(rawValue: awsRegion));
         if let item = info.itemProviders(for: ["public.file-url"]).first {
-                        item.loadItem(forTypeIdentifier: "public.file-url", options: nil) { (urlData, error) in
-                            DispatchQueue.main.async {
-                                if let urlData = urlData as? Data {
-                                    self.active = true
-                                    self.fileUrl = NSURL(absoluteURLWithDataRepresentation: urlData, relativeTo: nil) as URL
-                                    let key = NSUUID().uuidString
-                                    let request = S3.CreateMultipartUploadRequest(bucket: awsBucketName,
-                                                                                  contentDisposition: "inline",
-                                                                                  contentType: self.fileUrl!.mimeType(),
-                                                                                  key: key)
-                                    let multipartUploadRequest = s3.multipartUpload(
-                                        request,
-                                        partSize: 5*1024*1024,
-                                        filename: self.fileUrl!.path,
-                                        abortOnFail: true,
-                                        on: nil,
-                                        threadPoolProvider: .createNew
-                                    ) { progress in
-                                        self.uploadProgress = progress
-                                    }
-                                    
-                                    multipartUploadRequest.whenFailure { error in
-                                        self.active = false;
-                                        print(error)
-
-                                        DispatchQueue.main.async {
-                                            NSApplication.shared.presentError(error)
-                                        }
-                                        try! awsClient.syncShutdown()
-
-                                    }
-                                    
-                                    multipartUploadRequest.whenSuccess { output in
-                                        DispatchQueue.main.async {
-                                            let location = output.location!
-                                        
-                                            do {
-                                                
-                                                let pasteboard = NSPasteboard.general
-                                                pasteboard.clearContents()
-                                                pasteboard.setString(self.signedUrl!.absoluteString, forType: .string)
-                                                
-                                                notificationCenter.getNotificationSettings { settings in
-                                                    guard ((settings.authorizationStatus == .authorized) ||
-                                                           (settings.authorizationStatus == .provisional)) && settings.alertSetting == .enabled
-                                                    else { return }
-
-                                                    let content = UNMutableNotificationContent()
-                                                    content.title = "Upload finished"
-                                                    content.body = "Presigned URL has been copied to the clipboard"
-                                                    
-                                                    let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
-                                                    let request = UNNotificationRequest(identifier: key, content: content, trigger: trigger)
-                                                    notificationCenter.add(request);
-                                                }
-                                                try! awsClient.syncShutdown()
-                                                self.active = false
-                                            }
-                                            catch {
-                                                NSApplication.shared.presentError(error)
-                                                print("Could not generated presigned URL for \(location)")
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+            item.loadItem(forTypeIdentifier: "public.file-url", options: nil) { (urlData, error) in
+                DispatchQueue.main.async {
+                    if let urlData = urlData as? Data {
+                        self.active = true
+                        self.fileUrl = NSURL(absoluteURLWithDataRepresentation: urlData, relativeTo: nil) as URL
+                        let key = NSUUID().uuidString + "." + self.fileUrl!.pathExtension;
+                        let request = S3.CreateMultipartUploadRequest(bucket: awsBucketName,
+                                                                      contentDisposition: "inline",
+                                                                      contentType: self.fileUrl!.mimeType(),
+                                                                      key: key)
+                        let multipartUploadRequest = s3.multipartUpload(
+                            request,
+                            partSize: 5*1024*1024,
+                            filename: self.fileUrl!.path,
+                            abortOnFail: true,
+                            on: nil,
+                            threadPoolProvider: .createNew
+                        ) { progress in
+                            self.uploadProgress = progress
                         }
                         
-                        return true
+                        multipartUploadRequest.whenFailure { error in
+                            self.active = false;
+                            print(error)
+                            
+                            DispatchQueue.main.async {
+                                NSApplication.shared.presentError(error)
+                            }
+                            try! awsClient.syncShutdown()
+                            
+                        }
                         
-                    } else {
-                        return false
+                        multipartUploadRequest.whenSuccess { output in
+                            DispatchQueue.main.async {
+                                var location = output.location!
+                                
+                                if(self.customDomain.count > 0){
+                                    location = "https://"+customDomain+"/"+key;
+                                }
+                                
+                                self.generatedUrl = URL(string:location);
+                                
+                                let pasteboard = NSPasteboard.general
+                                pasteboard.clearContents()
+                                pasteboard.setString(location, forType: .string)
+                                
+                                notificationCenter.getNotificationSettings { settings in
+                                    guard ((settings.authorizationStatus == .authorized) ||
+                                           (settings.authorizationStatus == .provisional)) && settings.alertSetting == .enabled
+                                    else { return }
+                                    
+                                    let content = UNMutableNotificationContent()
+                                    content.title = "Upload finished"
+                                    content.body = "URL has been copied to the clipboard"
+                                    
+                                    let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
+                                    let request = UNNotificationRequest(identifier: key, content: content, trigger: trigger)
+                                    notificationCenter.add(request);
+                                }
+                                try! awsClient.syncShutdown()
+                                self.active = false
+                            }
+                        }
                     }
+                }
+            }
+            
+            return true
+            
+        } else {
+            return false
+        }
         
     }
     
     @Binding var fileUrl: URL?
-    @Binding var signedUrl: URL?
+    @Binding var generatedUrl: URL?
     @Binding var active: Bool
     @Binding var uploadProgress: Double
 }

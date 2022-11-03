@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 import SotoS3
+import LaunchAtLogin
 
 enum ObjectExpiryOptions: Int, Identifiable, CaseIterable {
     case one_hour = 1
@@ -28,6 +29,8 @@ struct SettingsView : View {
     @AppStorage("customDomain") private var customDomain = ""
     @AppStorage("awsRegion") private var awsRegion = "us-west-1"
     
+    @ObservedObject private var launchAtLoginObservable = LaunchAtLogin.observable;
+    
     @State private var showValidationAlert = false
     
    
@@ -38,6 +41,7 @@ struct SettingsView : View {
             TextField("AWS Region", text: $awsRegion)
             TextField("Bucket name", text: $awsBucketName)
             TextField("Custom Domain", text: $customDomain)
+            Toggle("Launch at login", isOn: $launchAtLoginObservable.isEnabled)
             Button("Done", action: {
                 showValidationAlert = awsAccessKeyId.isEmpty || awsBucketName.isEmpty || awsSecretAccessKey.isEmpty || awsRegion.isEmpty;
                 

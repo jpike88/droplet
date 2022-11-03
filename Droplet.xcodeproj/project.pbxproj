@@ -19,6 +19,7 @@
 		031EBBC4273A728300E01E12 /* MimeType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 031EBBC3273A728300E01E12 /* MimeType.swift */; };
 		031EBBCC273DA27A00E01E12 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 031EBBCB273DA27A00E01E12 /* Assets.xcassets */; };
 		031EBBCE273DA8DD00E01E12 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 031EBBCD273DA8DD00E01E12 /* SettingsView.swift */; };
+		415BD35629139EC6008FB6B6 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 415BD35529139EC6008FB6B6 /* LaunchAtLogin */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -63,6 +64,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				415BD35629139EC6008FB6B6 /* LaunchAtLogin in Frameworks */,
 				031EBBC0273A5EE700E01E12 /* SotoS3 in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -157,6 +159,7 @@
 				030685432739D53E00D4509D /* Sources */,
 				030685442739D53E00D4509D /* Frameworks */,
 				030685452739D53E00D4509D /* Resources */,
+				415BD35729139EFF008FB6B6 /* Launch at Login Helper */,
 			);
 			buildRules = (
 			);
@@ -165,6 +168,7 @@
 			name = Droplet;
 			packageProductDependencies = (
 				031EBBBF273A5EE700E01E12 /* SotoS3 */,
+				415BD35529139EC6008FB6B6 /* LaunchAtLogin */,
 			);
 			productName = Droplet;
 			productReference = 030685472739D53E00D4509D /* Droplet.app */;
@@ -240,6 +244,7 @@
 			mainGroup = 0306853E2739D53E00D4509D;
 			packageReferences = (
 				031EBBBE273A5EE700E01E12 /* XCRemoteSwiftPackageReference "soto" */,
+				415BD35429139EC6008FB6B6 /* XCRemoteSwiftPackageReference "LaunchAtLogin" */,
 			);
 			productRefGroup = 030685482739D53E00D4509D /* Products */;
 			projectDirPath = "";
@@ -277,6 +282,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		415BD35729139EFF008FB6B6 /* Launch at Login Helper */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Launch at Login Helper";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${BUILT_PRODUCTS_DIR}/LaunchAtLogin_LaunchAtLogin.bundle/Contents/Resources/copy-helper-swiftpm.sh\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		030685432739D53E00D4509D /* Sources */ = {
@@ -653,6 +680,14 @@
 				minimumVersion = 5.0.0;
 			};
 		};
+		415BD35429139EC6008FB6B6 /* XCRemoteSwiftPackageReference "LaunchAtLogin" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/LaunchAtLogin";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -660,6 +695,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 031EBBBE273A5EE700E01E12 /* XCRemoteSwiftPackageReference "soto" */;
 			productName = SotoS3;
+		};
+		415BD35529139EC6008FB6B6 /* LaunchAtLogin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 415BD35429139EC6008FB6B6 /* XCRemoteSwiftPackageReference "LaunchAtLogin" */;
+			productName = LaunchAtLogin;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

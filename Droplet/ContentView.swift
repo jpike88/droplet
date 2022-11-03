@@ -9,7 +9,7 @@ import SwiftUI
 
 struct DroppableArea: View {
     @State private var fileUrl: URL?
-    @State private var signedUrl: URL?
+    @State private var generatedUrl: URL?
     @State private var active = false
     @State private var uploadProgress = 0.0;
     
@@ -17,16 +17,16 @@ struct DroppableArea: View {
 
     var body: some View {
         
-        let dropDelegate = DropletDropDelegate(fileUrl: $fileUrl, signedUrl: $signedUrl, active: $active, uploadProgress: $uploadProgress)
+        let dropDelegate = DropletDropDelegate(fileUrl: $fileUrl, generatedUrl: $generatedUrl, active: $active, uploadProgress: $uploadProgress)
         
         VStack {
             Image("HeroImage")
             if self.active {
                 ProgressView(value: uploadProgress, total: 1.0).padding()
-            } else if (self.signedUrl != nil) {
-                Link("Open link in browser", destination: self.signedUrl!).padding()
+            } else if (self.generatedUrl != nil) {
+                Link("Open link in browser", destination: self.generatedUrl!).padding()
                 Spacer()
-                Button("Reset", action: { self.signedUrl = nil }).buttonStyle(.borderless)
+                Button("Reset", action: { self.generatedUrl = nil }).buttonStyle(.borderless)
             } else {
                 Text("Drop file here to upload").padding()
                 Spacer()
@@ -35,6 +35,7 @@ struct DroppableArea: View {
 
                 })
                 Button("Quit", action: { exit(0) }).buttonStyle(.borderless)
+                Text("jpike88/droplet").opacity(0.4)
             }
             
         }.frame(maxWidth: .infinity, maxHeight: .infinity).padding().fixedSize()
