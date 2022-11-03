@@ -25,8 +25,8 @@ struct SettingsView : View {
     @AppStorage("awsAccessKeyId") private var awsAccessKeyId = ""
     @AppStorage("awsSecretAccessKey") private var awsSecretAccessKey = ""
     @AppStorage("awsBucketName") private var awsBucketName = ""
+    @AppStorage("customDomain") private var customDomain = ""
     @AppStorage("awsRegion") private var awsRegion = "us-west-1"
-    @AppStorage("awsDefaultObjectExpiry") private var awsDefaultObjectExpiry = ObjectExpiryOptions.one_day
     
     @State private var showValidationAlert = false
     
@@ -37,10 +37,7 @@ struct SettingsView : View {
             SecureField("AWS Secret Access Key", text: $awsSecretAccessKey).redacted(reason: .privacy).textSelection(.disabled)
             TextField("AWS Region", text: $awsRegion)
             TextField("Bucket name", text: $awsBucketName)
-            Picker("Default object expiry", selection: $awsDefaultObjectExpiry) {
-                ForEach(ObjectExpiryOptions.allCases, id: \.self) { expiryOption in Text(expiryOption.id).tag(expiryOption.id) }
-            }
-            
+            TextField("Custom Domain", text: $customDomain)
             Button("Done", action: {
                 showValidationAlert = awsAccessKeyId.isEmpty || awsBucketName.isEmpty || awsSecretAccessKey.isEmpty || awsRegion.isEmpty;
                 

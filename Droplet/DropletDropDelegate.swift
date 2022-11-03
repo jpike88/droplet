@@ -15,7 +15,7 @@ struct DropletDropDelegate : DropDelegate {
     @AppStorage("awsSecretAccessKey") var awsSecretAccessKey = ""
     @AppStorage("awsRegion") var awsRegion = "";
     @AppStorage("awsBucketName") var awsBucketName = ""
-    @AppStorage("awsDefaultObjectExpiry") var awsDefaultObjectExpiry = ObjectExpiryOptions.one_day
+    @AppStorage("customDomain") var customDomain = ""
     
     
     func validateDrop(info: DropInfo) -> Bool {
@@ -70,11 +70,6 @@ struct DropletDropDelegate : DropDelegate {
                                             let location = output.location!
                                         
                                             do {
-                                                self.signedUrl = try s3.signURL(
-                                                    url: URL(string: location)!,
-                                                    httpMethod: .GET,
-                                                    expires: SotoS3.TimeAmount.hours(Int64(awsDefaultObjectExpiry.rawValue))
-                                                ).wait()
                                                 
                                                 let pasteboard = NSPasteboard.general
                                                 pasteboard.clearContents()
